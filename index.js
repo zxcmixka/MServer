@@ -20,8 +20,11 @@ const io = new Server(server, {
   allowEIO3: true,
 });
 
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://localhost:27017/messenger";
+
 mongoose
-  .connect("mongodb://localhost:27017/messenger")
+  .connect(MONGO_URI)
   .then(() => console.log("✅ Подключено к MongoDB!"))
   .catch((err) => console.error("❌ Ошибка БД:", err));
 
