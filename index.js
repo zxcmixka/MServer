@@ -8,25 +8,34 @@ const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
-const JWT_SECRET = "super_secret_key_12345";
 const onlineUsers = new Map();
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined");
+}
+
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "https://budka-virid.vercel.app" }));
 
 const io = new Server(server, {
-  cors: { origin: "*", methods: ["GET", "POST"] },
+  cors: { origin: "https://budka-virid.vercel.app", methods: ["GET", "POST"] },
   transports: ["websocket", "polling"],
   allowEIO3: true,
 });
 
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/messenger";
+const mongoose = require("mongoose");
+
+const MONGO_URI = process.env.MONGO_URI;
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("✅ Подключено к MongoDB!"))
-  .catch((err) => console.error("❌ Ошибка БД:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 const User = mongoose.model(
   "User",
